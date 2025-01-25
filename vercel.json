@@ -1,18 +1,26 @@
 {
-  "version": 2,
-  "builds": [
-    {
+    "builds": [
+      {
       "src": "main.py",
       "use": "@vercel/python",
       "config": {
         "pythonVersion": "3.10"
       }
+    },
+    {
+      "src": "build_files.sh",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "staticfiles" }
     }
   ],
-  "routes": [
-    {
+    "routes": [
+      {
+        "src": "/static/(.*)",
+        "dest": "/static/$1"
+      },
+      {
       "src": "/(.*)",
       "dest": "main.py"
-    }
-  ]
+    },
+    ]
 }
