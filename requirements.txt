@@ -171,3 +171,12 @@ webencodings==0.5.1
 websocket-client==1.8.0
 wordcloud==1.9.2
 wrapt==1.17.0
+fastapi
+uvicorn
+transformers
+spacy
+scikit-learn
+numpy
+torch
+torch==2.0.0+cpu  # Use the CPU-only version if you don't need GPU support
+spacy
