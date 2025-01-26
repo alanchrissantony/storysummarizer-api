@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import spacy.cli
+import spacy.cli.download
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import spacy
 from sklearn.metrics.pairwise import cosine_similarity
@@ -10,7 +12,12 @@ import torch
 app = FastAPI()
 
 
-nlp = spacy.load("en_core_web_sm")
+try:
+    nlp = spacy.load("en_core_web_sm")
+except OSError:
+    print("Downloading the SpaCy model...")
+    spacy.cli.download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
 
 MODEL_NAME = "facebook/bart-large-cnn"  
@@ -61,19 +68,6 @@ def summarize_extractive(text, num_sentences=3):
 
 
 
-def generate_intro(text, max_length=50):
-    prompt = f"Write a short description for the story: {text}"
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(device)
-    summary_ids = model.generate(
-        inputs["input_ids"],
-        max_length=max_length,
-        num_beams=5,
-        length_penalty=2.0,
-        early_stopping=True,
-    )
-    return tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-
-
 def generate_abstractive_summary(text, max_length=150):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512).to(device)
     summary_ids = model.generate(
@@ -99,7 +93,7 @@ def summarize(request: SummarizationRequest):
     if method == "extractive":
         summary = summarize_extractive(text)
     elif method == "abstractive":
-        summary = generate_intro(text, max_length)
+        summary = summarize_extractive(text)
     else:
         return {"error": f"Unsupported method: {method}"}
 
