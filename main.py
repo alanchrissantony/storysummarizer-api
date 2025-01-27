@@ -81,6 +81,10 @@ def generate_abstractive_summary(text, max_length=150):
 
 
 # API Route
+@app.get("/")
+def read_root():
+    return {"message": "Server, Started!"}
+
 @app.post("/summarize/")
 def summarize(request: SummarizationRequest):
     text = request.text
@@ -98,3 +102,8 @@ def summarize(request: SummarizationRequest):
         return {"error": f"Unsupported method: {method}"}
 
     return {"summary": summary}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=3000)
